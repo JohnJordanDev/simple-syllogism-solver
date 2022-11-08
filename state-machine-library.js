@@ -7,13 +7,44 @@
  */
 try {
   window.stateMachineFactory = (function () {
+    const getInitialState = function (machineDescription, historyStates) {
+      if (machineDescription.type === "parallel") {
+        // TODO: do things here...
+        return;
+      }
+      if (!(machineDescription.initial && machineDescription.states)) return;
+
+      let availableStates = machineDescription.states;
+      let initialState = availableStates[machineDescription.initial];
+      console.log(availableStates);
+      historyStates.push(machineDescription);
+      historyStates.push(initialState);
+
+      while (initialState.initial && initialState.states && initialState.states[initialState.initial]) {
+        availableStates = initialState.states;
+        console.log(availableStates);
+        initialState = availableStates[initialState.initial];
+        historyStates.push(initialState);
+
+        // console.log
+        if (initialState.type && initialState.type === "parallel") {
+          // do something here
+          return;
+        }
+      }
+      return initialState;
+    };
     const Factory = function (stateMachineDescription) {
-      let _state = stateMachineDescription["states"][stateMachineDescription.initial];
+      const _historyStates = [];
+      let _state = getInitialState(stateMachineDescription, _historyStates);
+
       let _statePath = stateMachineDescription.initial;
       let _pseudoStates = [];
+
       const m = {
         __proto__: Factory.prototype,
         get pseudoStates() { return _pseudoStates; },
+        get historyStates() { return _historyStates; },
         set pseudoStates(newState) {
           if (!Array.isArray(newState)) return this.disallowedAction("Pseudostate must be array");
           _pseudoStates = newState;
@@ -22,7 +53,9 @@ try {
         get state() {
           return _state;
         },
-        set state(newState) { return this.disallowedAction(`Trying to set manually, to '${newState}'`); },
+        set state(newState) {
+          _state = newState;
+        },
         get statePath() { return _statePath; },
         set statePath(newPath) {
           if (!this.isValidPath(newPath)) return;

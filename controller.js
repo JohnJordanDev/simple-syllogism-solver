@@ -22,10 +22,10 @@ try {
         }
       };
 
-      setTimeout(() => {
-        // processEventToStateMachine("ERROR", window.widget);
-        processEventToStateMachine("LOAD", widget);
-      }, 2000);
+      // setTimeout(() => {
+      //   // processEventToStateMachine("ERROR", window.widget);
+      //   processEventToStateMachine("LOAD", widget);
+      // }, 2000);
 
       window.widget = widget;
 

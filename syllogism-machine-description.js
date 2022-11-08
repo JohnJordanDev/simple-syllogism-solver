@@ -5,6 +5,7 @@ const syllogismDescription = {
   label: "rootState",
   states: {
     loading: {
+      initial: "majorTerm",
       label: "loading",
       on: {
         LOAD: {
@@ -12,6 +13,23 @@ const syllogismDescription = {
         },
         ERROR: {
           target: "loadingFailed"
+        }
+      },
+      states: {
+        majorTerm: {
+          initial: "subject",
+          label: "majorTerm",
+          states: {
+            subject: {
+              label: "subject"
+            }
+          }
+        },
+        minorTerm: {
+          label: "minorTerm"
+        },
+        conclusion: {
+          label: "conclusion"
         }
       }
     },
