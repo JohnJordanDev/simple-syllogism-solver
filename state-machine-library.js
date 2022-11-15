@@ -34,28 +34,7 @@ try {
       }
       // eslint-disable-next-line consistent-return
     };
-    /**
-     *
-     * @param {Object} machineDescription total description of all machine states
-     * @returns {Object} initialState inital state of the machine
-     */
-    const getInitialState = function (machineDescription) {
-      let initialState = {};
 
-      const availableFigures = machineDescription.states;
-      const initialFigure = availableFigures[machineDescription.initial];
-
-      initialState = { ...initialFigure };
-
-      let { majorPremise } = initialFigure.states;
-      majorPremise = majorPremise.states[majorPremise.initial];
-
-      let { minorPremise } = initialFigure.states;
-      minorPremise = minorPremise.states[minorPremise.initial];
-
-      initialState.states = { majorPremise, minorPremise };
-      return initialState;
-    };
     /**
      *
      * @param {Object} machineDescription total description of machine, to be decorated
@@ -68,11 +47,12 @@ try {
       depthFirstLabelling(o2Dec);
       return o2Dec;
     };
+
     const Factory = function (stateMachineDescription) {
       // TODO: figure out how to decorate all objects with label after key
       const _machineDescription = getMachineDescription(stateMachineDescription);
       const _historyStates = [];
-      let _state = getInitialState(_machineDescription);
+      let _state = {};
 
       const _statePath = stateMachineDescription.initial;
       let _pseudoStates = [];
@@ -104,6 +84,38 @@ try {
       return m;
     };
 
+    Factory.prototype.initialize = function () {
+      const intialFigure = this.machineDescription.initial;
+      this.state = this.moveToFigure(intialFigure, true);
+    };
+
+    /**
+     *
+     * @param {string} figureLabel name of figure to move to
+     * @param {boolean} initial true if initializing machine, false otherwise
+     * @returns {object} nextState next state object
+     */
+    Factory.prototype.moveToFigure = function (figureLabel, initial = false) {
+      let currentMajorType;
+      let currentMinorType;
+      if (initial) {
+        currentMajorType = this.machineDescription.states[figureLabel].states.majorPremise.initial;
+        currentMinorType = this.machineDescription.states[figureLabel].states.minorPremise.initial;
+      } else {
+        currentMajorType = this.state.states.majorPremise.label;
+        currentMinorType = this.state.states.minorPremise.label;
+      }
+      const nextState = { ...this.machineDescription.states[figureLabel] };
+
+      const majorPremise = nextState.states.majorPremise.states[currentMajorType];
+      const minorPremise = nextState.states.minorPremise.states[currentMinorType];
+      // will need to get this
+      const conclusion = nextState.states.conclusion.states["A"];
+
+      nextState.states = { majorPremise, minorPremise, conclusion };
+      return nextState;
+    };
+
     Factory.prototype.sendEvent = function (event) {
       if (this.state.on[event] && this.state.on[event].target) {
         this.transition(this.state, event);
@@ -117,18 +129,9 @@ try {
     Factory.prototype.transition = function (stateToTarget, event) {
       // this is assuming a SWITCH of figure ONLY, not other changes
       const nextStateLabel = stateToTarget.on[event].target;
-      const nextState = { ...this.machineDescription.states[nextStateLabel] };
       if (event.split("-")[0] === "SWITCH") {
-        const currentMajorType = this.state.states.majorPremise.label;
-        const currentMinorType = this.state.states.minorPremise.label;
-
-        const majorPremise = nextState.states.majorPremise.states[currentMajorType];
-        const minorPremise = nextState.states.minorPremise.states[currentMinorType];
-
-        nextState.states = { majorPremise, minorPremise };
+        this.state = this.moveToFigure(nextStateLabel);
       }
-
-      this.state = nextState;
     };
 
     return Factory;
