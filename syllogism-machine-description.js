@@ -1,5 +1,36 @@
 /* eslint-disable padded-blocks */
 /* eslint-disable no-trailing-spaces */
+
+// the 19 traditional conclusions
+const conclusions = {
+  first: {
+    AA: "A",
+    EA: "E",
+    AI: "I",
+    EI: "O"
+  },
+  second: {
+    EA: "E",
+    AE: "E",
+    EI: "O",
+    AO: "O"
+  }, 
+  third: {
+    AA: "I",
+    IA: "I",
+    AI: "I",
+    EA: "O",
+    OA: "O",
+    EI: "O"
+  },
+  fourth: {
+    AA: "I",
+    AE: "E",
+    IA: "I",
+    EA: "O",
+    EI: "O"
+  }
+};
 const figureSwitch = {
   "SWITCH-FIRST": {
     target: "first"
@@ -124,6 +155,7 @@ const getPremises = function (subjectPredicateMajor, subjectPredicateMinor) {
 
 const syllogismDescription = {
   initial: "first",
+  meta: { conclusions: { ...conclusions } },
   states: {
     first: {
       on: {
