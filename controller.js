@@ -10,12 +10,7 @@ try {
     };
 
     const processEventToStateMachine = function (event, machine) {
-      const initialState = widget.state;
-
-      machine.sendEvent(event);
-
-      if (initialState !== machine.state) {
-        console.log("state has changed!");
+      if (machine.sendEvent(event)) {
         renderMachineToDOM(machine.state, machineDomTarget);
       }
     };
@@ -28,6 +23,17 @@ try {
       const eventType = elem.dataset && elem.dataset.event;
       if (eventType) {
         processEventToStateMachine(eventType, widget);
+      }
+    });
+
+    document.addEventListener("change", (e) => {
+      const elem = e.target;
+
+      const eventType = `${elem.dataset.event}-${elem.value}`;
+      if (eventType) {
+        const target = elem.parentNode.id;
+        const type = eventType;
+        processEventToStateMachine({ target, type }, widget);
       }
     });
   };
