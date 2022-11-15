@@ -1,5 +1,7 @@
 try {
   const addHandlers = function addHandlers(widget) {
+    window.widget = widget;
+
     const machineDomTarget = document.getElementById("machine-target");
 
     const renderMachineToDOM = function (machineState, DOMTarget) {
@@ -28,10 +30,10 @@ try {
         processEventToStateMachine(eventType, widget);
       }
     });
-    window.widget = widget;
   };
-
-  addHandlers(window.stateMachineFactory(window.syllogismDescription));
+  const syllogismWidget = window.stateMachineFactory(window.syllogismDescription);
+  syllogismWidget.initialize();
+  addHandlers(syllogismWidget);
 } catch (error) {
   // eslint-disable-next-line no-console
   console.error("An error occured: ", error);

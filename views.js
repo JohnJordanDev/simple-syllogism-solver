@@ -25,7 +25,8 @@ const machineDOMTemplate = (machineState) => {
         <p>Machine is in the "${label}" figure</p>
       </section>
       <section id="majorTerm">${getTerm(machineState.states.majorPremise)} ${getSwitchButton("major")}</section>
-      <section id="minorTerm">${getTerm(machineState.states.minorPremise)} ${getSwitchButton("minor")}</section>`;
+      <section id="minorTerm">${getTerm(machineState.states.minorPremise)} ${getSwitchButton("minor")}</section>
+      <section id="conclusion">${getTerm(machineState.states.conclusion)}</section>`;
 
   return response;
 };
