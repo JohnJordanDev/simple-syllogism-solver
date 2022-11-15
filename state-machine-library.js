@@ -14,7 +14,7 @@ try {
         return id;
       };
     })();
-    const disallowedKeyNames = ["id", "initial", "label", "on", "onEntry", "onExit", "type"];
+    const disallowedKeyNames = ["id", "initial", "label", "meta", "on", "onEntry", "onExit", "type"];
     const depthFirstLabelling = function (o) {
       const keys = Object.keys(o);
       let keyName;
@@ -49,12 +49,9 @@ try {
     };
 
     const Factory = function (stateMachineDescription) {
-      // TODO: figure out how to decorate all objects with label after key
       const _machineDescription = getMachineDescription(stateMachineDescription);
       const _historyStates = [];
       let _state = {};
-
-      const _statePath = stateMachineDescription.initial;
       let _pseudoStates = [];
 
       const m = {
@@ -71,17 +68,22 @@ try {
         },
         set state(newState) {
           _state = newState;
+          console.log("state has changed!");
         },
-        get statePath() { return _statePath; },
-        set statePath(newPath) {
-
-        },
-        // TODO: replace this.states with this description of the machine itself.
         get machineDescription() {
           return _machineDescription;
         }
       };
       return m;
+    };
+
+    Factory.prototype.changePremiseType = function (premise, newType) {
+      const figureDescription = this.machineDescription.states[this.state.label];
+      // change the premise of current state, to that of record from machine description
+      this.state.states[premise] = figureDescription.states[premise].states[newType];
+      // eslint-disable-next-line no-self-assign
+      this.state = this.state; // to trigger central state change function
+      return true;
     };
 
     Factory.prototype.initialize = function () {
@@ -116,10 +118,24 @@ try {
       return nextState;
     };
 
-    Factory.prototype.sendEvent = function (event) {
-      if (this.state.on[event] && this.state.on[event].target) {
-        this.transition(this.state, event);
+    Factory.prototype.sendEvent = function (eventIn) {
+      const event = eventIn;
+      const currentFigure = this.state.label;
+      if (typeof event === "object" && event.type && event.target) {
+        const premises = this.machineDescription.states[currentFigure].states;
+        const majorPremTarget = premises.majorPremise.on[event.type].target;
+        const minorPremTarget = premises.minorPremise.on[event.type].target;
+        if (majorPremTarget || minorPremTarget) {
+          return this.transition(this.state, event);
+        }
       }
+      if (typeof event === "string") {
+        if (this.state.on[event] && this.state.on[event].target) {
+          // assume directed at current state
+          return this.transition(this.state, event);
+        }
+      }
+      return false;
     };
     /**
      *
@@ -127,11 +143,16 @@ try {
      * @param {String} event event to trigger on state
      */
     Factory.prototype.transition = function (stateToTarget, event) {
-      // this is assuming a SWITCH of figure ONLY, not other changes
-      const nextStateLabel = stateToTarget.on[event].target;
-      if (event.split("-")[0] === "SWITCH") {
-        this.state = this.moveToFigure(nextStateLabel);
+      if (!event.type && event.split("-")[0] === "SWITCH") {
+        const nextFigureLabel = stateToTarget.on[event].target;
+        this.state = this.moveToFigure(nextFigureLabel);
+        return true;
       }
+      if (event.type && event.type.split("-")[0] === "SELECT") {
+        const newPremiseType = event.type.split("-")[1];
+        return this.changePremiseType(event.target, newPremiseType);
+      }
+      return false;
     };
 
     return Factory;

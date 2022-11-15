@@ -91,6 +91,21 @@ const subjectPredicateConclusion = {
   }
 };
 
+const selectPremiseType = {
+  "SELECT-A": {
+    target: "A"
+  },
+  "SELECT-E": {
+    target: "E"
+  },
+  "SELECT-I": {
+    target: "I"
+  },
+  "SELECT-O": {
+    target: "O"
+  }
+};
+
 /**
  * 
  * @param {Object} subjectPredicateMajor subject and predicate for major premise
@@ -101,6 +116,9 @@ const getPremises = function (subjectPredicateMajor, subjectPredicateMinor) {
   return {
     majorPremise: {
       initial: "A",
+      on: {
+        ...selectPremiseType
+      },
       states: {
         A: {
           states: { ...subjectPredicateMajor }
@@ -118,6 +136,9 @@ const getPremises = function (subjectPredicateMajor, subjectPredicateMinor) {
     },
     minorPremise: {
       initial: "A",
+      on: {
+        ...selectPremiseType
+      },
       states: {
         A: {
           states: { ...subjectPredicateMinor }
