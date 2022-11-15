@@ -20,13 +20,13 @@ const middleTermMajorTerm = {
     label: "Middle Term"
   },
   predicate: {
-    label: "Major Term"
+    label: "Predicate"
   }
 };
 
 const minorTermMiddleTerm = {
   subject: {
-    label: "Minor Term"
+    label: "Subject"
   },
   predicate: {
     label: "Middle Term"
@@ -35,7 +35,7 @@ const minorTermMiddleTerm = {
 
 const majorTermMiddleTerm = {
   subject: {
-    label: "Major Term"
+    label: "Predicate"
   },
   predicate: {
     label: "Middle Term"
@@ -47,9 +47,19 @@ const middleTermMinorTerm = {
     label: "Middle Term"
   },
   predicate: {
-    label: "Minor Term"
+    label: "Subject"
   }
 };
+
+const subjectPredicateConclusion = {
+  subject: {
+    label: "Subject"
+  },
+  predicate: {
+    label: "Predicate"
+  }
+};
+
 /**
  * 
  * @param {Object} subjectPredicateMajor subject and predicate for major premise
@@ -89,6 +99,23 @@ const getPremises = function (subjectPredicateMajor, subjectPredicateMinor) {
         },
         O: {
           states: { ...subjectPredicateMinor }
+        }
+      }
+    },
+    conclusion: {
+      initial: "A",
+      states: {
+        A: {
+          states: { ...subjectPredicateConclusion }
+        },
+        E: {
+          states: { ...subjectPredicateConclusion }
+        },
+        I: {
+          states: { ...subjectPredicateConclusion }
+        },
+        O: {
+          states: { ...subjectPredicateConclusion }
         }
       }
     }
