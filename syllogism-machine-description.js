@@ -182,7 +182,7 @@ const syllogismDescription = {
   initial: "first",
   meta: { 
     conclusions: { ...conclusions },
-    termLabels: {
+    termWords: {
       [majorTerm]: "",
       [middleTerm]: "",
       [minorTerm]: ""
