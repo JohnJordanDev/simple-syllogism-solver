@@ -1,11 +1,9 @@
 try {
   const addHandlers = function addHandlers(widget) {
-    window.widget = widget;
 
     const machineDomTarget = document.getElementById("machine-target");
 
     const renderMachineToDOM = function (machine, DOMTarget) {
-      const machineState = machine.state;
       // eslint-disable-next-line no-param-reassign
       DOMTarget.innerHTML = (window.machineDOMTemplate(machine));
     };
@@ -40,6 +38,7 @@ try {
   };
   const syllogismWidget = window.stateMachineFactory(window.syllogismDescription);
   syllogismWidget.initialize();
+  window.widget = syllogismWidget;
   addHandlers(syllogismWidget);
 } catch (error) {
   // eslint-disable-next-line no-console
