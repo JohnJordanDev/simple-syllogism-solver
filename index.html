@@ -10,6 +10,7 @@
     <script defer src="controller.js"></script>
     <title>Document</title>
     <style>
+
         nav {
             display: flex;
             justify-content: space-around;
@@ -19,10 +20,21 @@
             box-sizing: border-box;
             padding: 1rem;
         }
+        @media screen and (min-width: 32rem) {
+            main {
+                max-width: 32rem;
+                margin: 0 auto;
+                background-color: #fefefe;
+            }
+        }
     </style>
 </head>
 <body>
-    goo
-    <main id="machine-target"></main>
+    <main>
+        <header>
+            <h1>Simple Syllogism Solver</h1>
+        </header>
+        <article id="machine-target"></article>
+    </main>
 </body>
 </html>
