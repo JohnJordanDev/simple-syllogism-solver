@@ -18,12 +18,12 @@ try {
         keyName = keys[i];
         keyValue = o[keyName];
 
-        // TODO Add list of excluded property names, e.g. ID, initial, type etc.
         if (disallowedKeyNames.indexOf(keyName) === -1) {
           if (keyName !== "states" && !keyValue.label) {
             keyValue.label = keyName;
             keyValue.id = getID();
           }
+          if (typeof keyValue !== "object") return;
           depthFirstLabelling(keyValue);
         }
       }
@@ -54,7 +54,9 @@ try {
         },
         set state(newState) {
           _state = newState;
-          console.log("state has changed!");
+          console.log("state has changed...");
+          this.state.states.conclusion = this.getNewConclusion();
+          console.log(this.state.states.conclusion && this.state.states.conclusion.label);
         },
         get machineDescription() {
           return _machineDescription;
@@ -63,10 +65,31 @@ try {
       return m;
     };
 
+    Factory.prototype.getConclusionType = function (majorPremiseType = "", minorPremiseType = "", figure = "") {
+      const { states } = this.state;
+      const currentFigure = figure || this.state.label;
+      const { conclusions } = this.machineDescription.meta;
+      const majorType = majorPremiseType || states.majorPremise.label;
+      const minorType = minorPremiseType || states.minorPremise.label;
+      const lookup = `${majorType}${minorType}`;
+      return conclusions[currentFigure][lookup] || null;
+    };
+
+    /**
+     *
+     * @param {string} details meta details to retrieve
+     * @returns
+     */
     Factory.prototype.getMetaDetails = function (details) {
       const { meta } = this.machineDescription;
       if (meta[details]) return meta[details];
       return meta;
+    };
+
+    Factory.prototype.getNewConclusion = function () {
+      const currentFigure = this.state.label;
+      const newConclusionType = this.getConclusionType();
+      return this.machineDescription.states[currentFigure].states.conclusion.states[newConclusionType];
     };
 
     Factory.prototype.changePremiseType = function (premise, newType) {
@@ -87,7 +110,7 @@ try {
      *
      * @param {string} figureLabel name of figure to move to
      * @param {boolean} initial true if initializing machine, false otherwise
-     * @returns {object} nextState next state object
+     * @returns {object} nextState state object for the new state the machine has moved to
      */
     Factory.prototype.moveToFigure = function (figureLabel, initial = false) {
       let currentMajorType;
@@ -103,10 +126,8 @@ try {
 
       const majorPremise = nextState.states.majorPremise.states[currentMajorType];
       const minorPremise = nextState.states.minorPremise.states[currentMinorType];
-      // will need to get this
-      const conclusion = nextState.states.conclusion.states["A"];
 
-      nextState.states = { majorPremise, minorPremise, conclusion };
+      nextState.states = { majorPremise, minorPremise };
       return nextState;
     };
 
