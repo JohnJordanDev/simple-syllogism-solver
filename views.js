@@ -5,31 +5,55 @@ const getDirectFigureNav = function () {
   <a href="#" data-event="SWITCH-THIRD">III</a>
   <a href="#" data-event="SWITCH-FOURTH">IV</a></nav>`;
 };
-const getQuantityQualityInput = function (premise) {
+const getQualityInput = function (premiseLabel) {
+  const isSelected = (optionValue) => (optionValue === premiseLabel ? "selected" : "");
+  if (premiseLabel === "I" || premiseLabel === "O") {
+    return `<select data-event="SELECT" value="${premiseLabel}">
+    <option value="I" ${isSelected("I")}>are</option>
+    <option value="O" ${isSelected("O")}>are not</option>
+  </select>`;
+  }
+
+  return "are";
+};
+
+const getQuantityInput = function (premise) {
   const isSelected = (optionValue) => (optionValue === premise.label ? "selected" : "");
   return `<select data-event="SELECT" value="${premise.label}">
-    <option value="A" ${isSelected("A")}>All are</option>
-    <option value="E" ${isSelected("E")}>None are</option>
-    <option value="I" ${isSelected("I")}>Some are</option>
-    <option value="O" ${isSelected("O")}>Some are not</option>
+    <option value="A" ${isSelected("A")}>All</option>
+    <option value="E" ${isSelected("E")}>None</option>
+    <option value="I" ${isSelected("I") || isSelected("O")}>Some</option>
   </select>`;
 };
 const getSwitchButton = function (termLabel) {
   return `<button data-event="SWITCH-${termLabel.toUpperCase()}">Switch</button>`;
 };
 
-const getTerm = function (premiseState, termLabels = null) {
+const getConclusion = function (premiseState, termWords = null) {
+  if (!premiseState) return "We cannot draw a conclusion";
   const subject = premiseState.states.subject.label;
   const predicate = premiseState.states.predicate.label;
-  const subjectLabel = termLabels && termLabels[subject] ? termLabels[subject] : "";
-  const predicateLabel = termLabels && termLabels[predicate] ? termLabels[predicate] : "";
+  const subjectWord = termWords && termWords[subject] ? termWords[subject] : "";
+  const predicateWord = termWords && termWords[predicate] ? termWords[predicate] : "";
+  const copula = premiseState.label === "O" ? "are not" : "are";
+  const quantityWords = { A: "All", E: "No" };
+  const quantity = quantityWords[premiseState.label] || "Some";
+  return `∴ ${premiseState.label}: ${quantity} ${subjectWord} (${subject}) ${copula} ${predicateWord} (${predicate})`;
+};
 
-  return `${subjectLabel} (${subject}) -- ${predicateLabel} (${predicate})`;
+const getPremise = function (premiseState, termWords = null) {
+  const subject = premiseState.states.subject.label;
+  const predicate = premiseState.states.predicate.label;
+  const subjectWord = termWords && termWords[subject] ? termWords[subject] : "";
+  const predicateWord = termWords && termWords[predicate] ? termWords[predicate] : "";
+  const copula = getQualityInput(premiseState.label);
+
+  return `${subjectWord} (${subject}) ${copula} ${predicateWord} (${predicate})`;
 };
 
 const machineDOMTemplate = (machine) => {
   const machineState = machine.state;
-  const termLabels = machine.getMetaDetails("termLabels");
+  const termWords = machine.getMetaDetails("termWords");
   const { label } = machineState;
   const premiseStates = machineState.states;
 
@@ -37,9 +61,9 @@ const machineDOMTemplate = (machine) => {
       ${getDirectFigureNav()}
         <p>Machine is in the "${label}" figure</p>
       </section>
-      <section id="majorPremise">${getQuantityQualityInput(premiseStates.majorPremise)} ${premiseStates.majorPremise.label}: ${getTerm(premiseStates.majorPremise, termLabels)} ${getSwitchButton("major")}</section>
-      <section id="minorPremise">${getQuantityQualityInput(premiseStates.minorPremise)} ${premiseStates.minorPremise.label}: ${getTerm(premiseStates.minorPremise, termLabels)} ${getSwitchButton("minor")}</section>
-      <section id="conclusion">${getTerm(premiseStates.conclusion, termLabels)}</section>`;
+      <section id="majorPremise">${getQuantityInput(premiseStates.majorPremise)} ${premiseStates.majorPremise.label}: ${getPremise(premiseStates.majorPremise, termWords)} ${getSwitchButton("major")}</section>
+      <section id="minorPremise">${getQuantityInput(premiseStates.minorPremise)} ${premiseStates.minorPremise.label}: ${getPremise(premiseStates.minorPremise, termWords)} ${getSwitchButton("minor")}</section>
+      <section id="conclusion">${getConclusion(premiseStates.conclusion, termWords)}</section>`;
 
   return response;
 };
