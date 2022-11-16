@@ -18,22 +18,28 @@ const getSwitchButton = function (termLabel) {
   return `<button data-event="SWITCH-${termLabel.toUpperCase()}">Switch</button>`;
 };
 
-const getTerm = function (premiseState) {
+const getTerm = function (premiseState, termLabels = null) {
   const subject = premiseState.states.subject.label;
   const predicate = premiseState.states.predicate.label;
-  return `${subject} -- ${predicate}`;
+  const subjectLabel = termLabels && termLabels[subject] ? termLabels[subject] : "";
+  const predicateLabel = termLabels && termLabels[predicate] ? termLabels[predicate] : "";
+
+  return `${subjectLabel} (${subject}) -- ${predicateLabel} (${predicate})`;
 };
 
-const machineDOMTemplate = (machineState) => {
+const machineDOMTemplate = (machine) => {
+  const machineState = machine.state;
+  const termLabels = machine.getMetaDetails("termLabels");
   const { label } = machineState;
+  const premiseStates = machineState.states;
 
   const response = `<section>
       ${getDirectFigureNav()}
         <p>Machine is in the "${label}" figure</p>
       </section>
-      <section id="majorPremise">${getQuantityQualityInput(machineState.states.majorPremise)} ${machineState.states.majorPremise.label}: ${getTerm(machineState.states.majorPremise)} ${getSwitchButton("major")}</section>
-      <section id="minorPremise">${getQuantityQualityInput(machineState.states.minorPremise)} ${machineState.states.minorPremise.label}: ${getTerm(machineState.states.minorPremise)} ${getSwitchButton("minor")}</section>
-      <section id="conclusion">${getTerm(machineState.states.conclusion)}</section>`;
+      <section id="majorPremise">${getQuantityQualityInput(premiseStates.majorPremise)} ${premiseStates.majorPremise.label}: ${getTerm(premiseStates.majorPremise, termLabels)} ${getSwitchButton("major")}</section>
+      <section id="minorPremise">${getQuantityQualityInput(premiseStates.minorPremise)} ${premiseStates.minorPremise.label}: ${getTerm(premiseStates.minorPremise, termLabels)} ${getSwitchButton("minor")}</section>
+      <section id="conclusion">${getTerm(premiseStates.conclusion, termLabels)}</section>`;
 
   return response;
 };

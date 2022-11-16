@@ -1,6 +1,10 @@
 /* eslint-disable padded-blocks */
 /* eslint-disable no-trailing-spaces */
 
+const majorTerm = "Major Term"; 
+const middleTerm = "Middle Term";
+const minorTerm = "Minor Term";
+
 // the 19 traditional conclusions
 const conclusions = {
   first: {
@@ -48,46 +52,46 @@ const figureSwitch = {
 
 const middleTermMajorTerm = {
   subject: {
-    label: "Middle Term"
+    label: middleTerm
   },
   predicate: {
-    label: "Predicate"
+    label: majorTerm
   }
 };
 
 const minorTermMiddleTerm = {
   subject: {
-    label: "Subject"
+    label: minorTerm
   },
   predicate: {
-    label: "Middle Term"
+    label: middleTerm
   }
 };
 
 const majorTermMiddleTerm = {
   subject: {
-    label: "Predicate"
+    label: majorTerm
   },
   predicate: {
-    label: "Middle Term"
+    label: middleTerm
   }
 };
 
 const middleTermMinorTerm = {
   subject: {
-    label: "Middle Term"
+    label: middleTerm
   },
   predicate: {
-    label: "Subject"
+    label: minorTerm
   }
 };
 
 const subjectPredicateConclusion = {
   subject: {
-    label: "Subject"
+    label: minorTerm
   },
   predicate: {
-    label: "Predicate"
+    label: majorTerm
   }
 };
 
@@ -176,7 +180,14 @@ const getPremises = function (subjectPredicateMajor, subjectPredicateMinor) {
 
 const syllogismDescription = {
   initial: "first",
-  meta: { conclusions: { ...conclusions } },
+  meta: { 
+    conclusions: { ...conclusions },
+    termLabels: {
+      [majorTerm]: "",
+      [middleTerm]: "",
+      [minorTerm]: ""
+    } 
+  },
   states: {
     first: {
       on: {

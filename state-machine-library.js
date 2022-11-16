@@ -1,9 +1,4 @@
 /* eslint-disable dot-notation */
-/**
- * Notes
- * 1. Difference between 'jump' (using statePath; doesn't trigger entry/exit actions)
- *  and 'transition' (transition state; does trigger entry/exit actions)
- */
 try {
   window.stateMachineFactory = (function () {
     const getID = (function () {
@@ -50,19 +45,10 @@ try {
 
     const Factory = function (stateMachineDescription) {
       const _machineDescription = getMachineDescription(stateMachineDescription);
-      const _historyStates = [];
       let _state = {};
-      let _pseudoStates = [];
 
       const m = {
         __proto__: Factory.prototype,
-        get pseudoStates() { return _pseudoStates; },
-        get historyStates() { return _historyStates; },
-        set pseudoStates(newState) {
-          if (!Array.isArray(newState)) return this.disallowedAction("Pseudostate must be array");
-          _pseudoStates = newState;
-          return true;
-        },
         get state() {
           return _state;
         },
@@ -75,6 +61,12 @@ try {
         }
       };
       return m;
+    };
+
+    Factory.prototype.getMetaDetails = function (details) {
+      const { meta } = this.machineDescription;
+      if (meta[details]) return meta[details];
+      return meta;
     };
 
     Factory.prototype.changePremiseType = function (premise, newType) {
@@ -134,6 +126,22 @@ try {
           // assume directed at current state
           return this.transition(this.state, event);
         }
+      }
+      return false;
+    };
+    /**
+     *
+     * @param {string} metaProp name of meta property to change
+     * @param {object} newDetails object with updated meta details
+     * @returns
+     */
+    Factory.prototype.setMetaDetails = function (metaProp, newDetails) {
+      const { meta } = this.machineDescription;
+      const propToChange = meta[metaProp];
+      if (propToChange) {
+        const newProp = { ...propToChange, ...newDetails };
+        this.machineDescription.meta[metaProp] = newProp;
+        return true;
       }
       return false;
     };

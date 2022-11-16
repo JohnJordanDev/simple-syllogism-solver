@@ -4,18 +4,19 @@ try {
 
     const machineDomTarget = document.getElementById("machine-target");
 
-    const renderMachineToDOM = function (machineState, DOMTarget) {
+    const renderMachineToDOM = function (machine, DOMTarget) {
+      const machineState = machine.state;
       // eslint-disable-next-line no-param-reassign
-      DOMTarget.innerHTML = (window.machineDOMTemplate(machineState));
+      DOMTarget.innerHTML = (window.machineDOMTemplate(machine));
     };
 
     const processEventToStateMachine = function (event, machine) {
       if (machine.sendEvent(event)) {
-        renderMachineToDOM(machine.state, machineDomTarget);
+        renderMachineToDOM(machine, machineDomTarget);
       }
     };
 
-    renderMachineToDOM(widget.state, machineDomTarget);
+    renderMachineToDOM(widget, machineDomTarget);
 
     document.addEventListener("click", (e) => {
       e.preventDefault();
