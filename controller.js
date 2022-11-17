@@ -6,9 +6,8 @@ try {
       const activeE = document.activeElement;
       // eslint-disable-next-line no-param-reassign
       DOMTarget.innerHTML = (window.machineDOMTemplate(machine));
-      console.log(activeE);
-      if (activeE && activeE.tagName !== "BODY") {
-        console.log("is element stale?", activeE);
+      if (activeE && activeE.tagName !== "BODY" && activeE.id) {
+        document.getElementById(activeE.id).focus();
       }
     };
 
@@ -25,8 +24,13 @@ try {
       const elem = e.target;
       const eventType = elem.dataset && elem.dataset.event;
       if (eventType) {
-        processEventToStateMachine(eventType, widget);
+        return processEventToStateMachine(eventType, widget);
       }
+      const p = elem.parentNode;
+      if (p.dataset && p.dataset.event) {
+        return processEventToStateMachine(p.dataset.event, widget);
+      }
+      return false;
     });
 
     document.addEventListener("change", (e) => {
