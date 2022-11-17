@@ -17,9 +17,9 @@ const getQualityInput = function (premiseLabel) {
   return "are";
 };
 
-const getQuantityInput = function (premise) {
-  const isSelected = (optionValue) => (optionValue === premise.label ? "selected" : "");
-  return `<select data-event="SELECT" value="${premise.label}">
+const getQuantityInput = function (premiseState, premiseName) {
+  const isSelected = (optionValue) => (optionValue === premiseState.label ? "selected" : "");
+  return `<select data-event="SELECT" id="quantity-${premiseName}"value="${premiseState.label}">
     <option value="A" ${isSelected("A")}>All</option>
     <option value="E" ${isSelected("E")}>None</option>
     <option value="I" ${isSelected("I") || isSelected("O")}>Some</option>
@@ -61,8 +61,8 @@ const machineDOMTemplate = (machine) => {
       ${getDirectFigureNav()}
         <p>Machine is in the "${label}" figure</p>
       </section>
-      <section id="majorPremise">${getQuantityInput(premiseStates.majorPremise)} ${premiseStates.majorPremise.label}: ${getPremise(premiseStates.majorPremise, termWords)} ${getSwitchButton("major")}</section>
-      <section id="minorPremise">${getQuantityInput(premiseStates.minorPremise)} ${premiseStates.minorPremise.label}: ${getPremise(premiseStates.minorPremise, termWords)} ${getSwitchButton("minor")}</section>
+      <section id="majorPremise">${getQuantityInput(premiseStates.majorPremise, "major")} ${premiseStates.majorPremise.label}: ${getPremise(premiseStates.majorPremise, termWords)} ${getSwitchButton("major")}</section>
+      <section id="minorPremise">${getQuantityInput(premiseStates.minorPremise, "minor")} ${premiseStates.minorPremise.label}: ${getPremise(premiseStates.minorPremise, termWords)} ${getSwitchButton("minor")}</section>
       <section id="conclusion">${getConclusion(premiseStates.conclusion, termWords)}</section>`;
 
   return response;

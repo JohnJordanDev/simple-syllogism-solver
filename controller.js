@@ -1,11 +1,15 @@
 try {
   const addHandlers = function addHandlers(widget) {
-
     const machineDomTarget = document.getElementById("machine-target");
 
     const renderMachineToDOM = function (machine, DOMTarget) {
+      const activeE = document.activeElement;
       // eslint-disable-next-line no-param-reassign
       DOMTarget.innerHTML = (window.machineDOMTemplate(machine));
+      console.log(activeE);
+      if (activeE && activeE.tagName !== "BODY") {
+        console.log("is element stale?", activeE);
+      }
     };
 
     const processEventToStateMachine = function (event, machine) {
