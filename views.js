@@ -1,14 +1,20 @@
 const getDirectFigureNav = function () {
   return `<nav>
-  <a href="#" data-event="SWITCH-FIRST">I</a>
-  <a href="#" data-event="SWITCH-SECOND">II</a>
-  <a href="#" data-event="SWITCH-THIRD">III</a>
-  <a href="#" data-event="SWITCH-FOURTH">IV</a></nav>`;
+  <a href="#" id="select-first-figure" data-event="SWITCH-FIRST">I<div>first</div></a>
+  <a href="#" id="select-second-figure" data-event="SWITCH-SECOND">II<div>second</div></a>
+  <a href="#" id="select-third-figure" data-event="SWITCH-THIRD">III<div>third</div></a>
+  <a href="#" id="select-fourth-figure" data-event="SWITCH-FOURTH">IV<div>fourth</div></a></nav>`;
 };
-const getQualityInput = function (premiseLabel) {
-  const isSelected = (optionValue) => (optionValue === premiseLabel ? "selected" : "");
-  if (premiseLabel === "I" || premiseLabel === "O") {
-    return `<select data-event="SELECT" value="${premiseLabel}">
+/**
+ *
+ * @param {string} premiseType type of the premise (I or O)
+ * @param {string} premiseName name of the premise (major or minor)
+ * @returns {DOMString|string}
+ */
+const getQualityInput = function (premiseType, premiseName = "") {
+  const isSelected = (optionValue) => (optionValue === premiseType ? "selected" : "");
+  if (premiseType === "I" || premiseType === "O") {
+    return `<select data-event="SELECT" id="quality-${premiseName}" value="${premiseType}">
     <option value="I" ${isSelected("I")}>are</option>
     <option value="O" ${isSelected("O")}>are not</option>
   </select>`;
@@ -26,7 +32,7 @@ const getQuantityInput = function (premiseState, premiseName) {
   </select>`;
 };
 const getSwitchButton = function (termLabel) {
-  return `<button data-event="SWITCH-${termLabel.toUpperCase()}">Switch</button>`;
+  return `<button id="switch-terms-${termLabel}" data-event="SWITCH-${termLabel.toUpperCase()}">Switch</button>`;
 };
 
 const getConclusion = function (premiseState, termWords = null) {
@@ -40,13 +46,19 @@ const getConclusion = function (premiseState, termWords = null) {
   const quantity = quantityWords[premiseState.label] || "Some";
   return `∴ ${premiseState.label}: ${quantity} ${subjectWord} (${subject}) ${copula} ${predicateWord} (${predicate})`;
 };
-
-const getPremise = function (premiseState, termWords = null) {
+/**
+ *
+ * @param {object} premiseState state object of a premise
+ * @param {object} termWords words for syllogism terms (from user input)
+ * @param {string} premiseName name of the premise (major or minor)
+ * @returns {string} DOM string
+ */
+const getPremise = function (premiseState, termWords = null, premiseName = "") {
   const subject = premiseState.states.subject.label;
   const predicate = premiseState.states.predicate.label;
   const subjectWord = termWords && termWords[subject] ? termWords[subject] : "";
   const predicateWord = termWords && termWords[predicate] ? termWords[predicate] : "";
-  const copula = getQualityInput(premiseState.label);
+  const copula = getQualityInput(premiseState.label, premiseName);
 
   return `${subjectWord} (${subject}) ${copula} ${predicateWord} (${predicate})`;
 };
@@ -61,8 +73,12 @@ const machineDOMTemplate = (machine) => {
       ${getDirectFigureNav()}
         <p>Machine is in the "${label}" figure</p>
       </section>
-      <section id="majorPremise">${getQuantityInput(premiseStates.majorPremise, "major")} ${premiseStates.majorPremise.label}: ${getPremise(premiseStates.majorPremise, termWords)} ${getSwitchButton("major")}</section>
-      <section id="minorPremise">${getQuantityInput(premiseStates.minorPremise, "minor")} ${premiseStates.minorPremise.label}: ${getPremise(premiseStates.minorPremise, termWords)} ${getSwitchButton("minor")}</section>
+      <section id="majorPremise">
+        ${getQuantityInput(premiseStates.majorPremise, "major")} ${premiseStates.majorPremise.label}: ${getPremise(premiseStates.majorPremise, termWords, "major")} ${getSwitchButton("major")}
+      </section>
+      <section id="minorPremise">
+        ${getQuantityInput(premiseStates.minorPremise, "minor")} ${premiseStates.minorPremise.label}: ${getPremise(premiseStates.minorPremise, termWords, "minor")} ${getSwitchButton("minor")}
+      </section>
       <section id="conclusion">${getConclusion(premiseStates.conclusion, termWords)}</section>`;
 
   return response;
