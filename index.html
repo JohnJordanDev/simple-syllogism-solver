@@ -11,11 +11,16 @@
     <script defer src="tests.js"></script>
     <title>Document</title>
     <style>
-
+        :focus {
+            outline: solid 0.125rem red;
+        }
         nav {
             display: flex;
             justify-content: space-around;
         }
+        nav > a {
+            text-align: center;
+        } 
         section {
             border: solid 0.125rem #DEDEDE;
             box-sizing: border-box;
