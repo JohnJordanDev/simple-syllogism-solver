@@ -20,7 +20,6 @@ try {
     renderMachineToDOM(widget, machineDomTarget);
 
     document.addEventListener("click", (e) => {
-      e.preventDefault();
       const elem = e.target;
       const eventType = elem.dataset && elem.dataset.event;
       if (eventType) {

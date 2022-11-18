@@ -1,10 +1,30 @@
-const getDirectFigureNav = function () {
-  return `<nav>
-  <a href="#" id="select-first-figure" data-event="SWITCH-FIRST">I<div>first</div></a>
-  <a href="#" id="select-second-figure" data-event="SWITCH-SECOND">II<div>second</div></a>
-  <a href="#" id="select-third-figure" data-event="SWITCH-THIRD">III<div>third</div></a>
-  <a href="#" id="select-fourth-figure" data-event="SWITCH-FOURTH">IV<div>fourth</div></a></nav>`;
+/* eslint-disable no-plusplus */
+/* eslint-disable no-cond-assign */
+/**
+ *
+ * @param {string} figure name of current syllogism figure
+ * @returns {string|DOMString}
+ */
+const getDirectFigureNav = function (figure) {
+  let radios = "";
+  const figures = ["first", "second", "third", "fourth"];
+  for (let i = 0, r; r = figures[i]; i++) {
+    // eslint-disable-next-line no-use-before-define
+    radios += getFigureRadioElem(r, figure);
+  }
+  return `<fieldset>
+    <legend>Figure</legend>
+    ${radios}
+    </fieldset>`;
 };
+
+function getFigureRadioElem(figureType, currentFigure) {
+  const checked = (figureType === currentFigure) ? "checked" : "";
+  return `<label for="select-${figureType}-figure">
+  ${figureType[0].toUpperCase() + figureType.slice(1)}
+  <input type="radio" name="figure" id="select-${figureType}-figure" value="first" data-event="SWITCH-${figureType.toUpperCase()}" ${checked}>
+</label>`;
+}
 /**
  *
  * @param {string} premiseType type of the premise (I or O)
@@ -66,20 +86,20 @@ const getPremise = function (premiseState, termWords = null, premiseName = "") {
 const machineDOMTemplate = (machine) => {
   const machineState = machine.state;
   const termWords = machine.getMetaDetails("termWords");
-  const { label } = machineState;
   const premiseStates = machineState.states;
 
-  const response = `<section>
-      ${getDirectFigureNav()}
-        <p>Machine is in the "${label}" figure</p>
-      </section>
-      <section id="majorPremise">
+  const response = `<form id="simple-syllogism">
+      ${getDirectFigureNav(machine.state.label)}
+      <fieldset id="majorPremise">
+      <legend>Major Premise</legend>
         ${getQuantityInput(premiseStates.majorPremise, "major")} ${premiseStates.majorPremise.label}: ${getPremise(premiseStates.majorPremise, termWords, "major")} ${getSwitchButton("major")}
-      </section>
-      <section id="minorPremise">
+      </fieldset>
+      <fieldset id="minorPremise">
+        <legend>Minor Premise</legend>
         ${getQuantityInput(premiseStates.minorPremise, "minor")} ${premiseStates.minorPremise.label}: ${getPremise(premiseStates.minorPremise, termWords, "minor")} ${getSwitchButton("minor")}
-      </section>
-      <section id="conclusion">${getConclusion(premiseStates.conclusion, termWords)}</section>`;
+      </fieldset>
+      </form>
+      <output for="simple-syllogism" id="conclusion">${getConclusion(premiseStates.conclusion, termWords)}</output>`;
 
   return response;
 };
